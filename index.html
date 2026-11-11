@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+<style>
+body { font-family: Arial, sans-serif; font-size: 14pt; color: #222; background: #f4f6f8; margin: 30px; }
+input[type=text], input[type=password] { font-size: 14pt; padding: 5px; margin: 5px 0 12px 0; }
+button { font-size: 14pt; padding: 6px 14px; margin-right: 8px; }
+</style>
+</head>
+<body>
+<h1>Login</h1>
+
+<label for="username">Username:</label><br>
+<input type="text" id="username"><br>
+
+<label for="password">Password:</label><br>
+<input type="password" id="password"><br>
+
+<input type="checkbox" id="remember">
+<label for="remember">Remember username</label><br><br>
+
+<button id="loginButton">Login</button>
+<button id="createButton">Create Account</button>
+
+<script>
+var usernameBox = document.getElementById("username");
+var passwordBox = document.getElementById("password");
+var remember = document.getElementById("remember");
+
+// On page load: restore the checkbox, and the username if it is checked
+if (localStorage.getItem("rememberChecked") === "true") {
+  remember.checked = true;
+  var saved = localStorage.getItem("rememberedUsername");
+  if (saved !== null) {
+    usernameBox.value = saved;
+  }
+}
+
+// Save the checkbox state whenever it changes
+remember.addEventListener("change", function () {
+  localStorage.setItem("rememberChecked", remember.checked);
+  if (!remember.checked) {
+    localStorage.removeItem("rememberedUsername");
+  }
+});
+
+// Login button
+document.getElementById("loginButton").addEventListener("click", function () {
+  var username = usernameBox.value;
+  var password = passwordBox.value;
+
+  if (remember.checked) {
+    localStorage.setItem("rememberedUsername", username);
+  }
+
+  // Read the Account List
+  var list = JSON.parse(localStorage.getItem("accountList") || "[]");
+
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].username === username && list[i].password === password) {
+      sessionStorage.setItem("loggedInId", list[i].id);
+      window.location.href = "form.html";
+      return;
+    }
+  }
+
+  alert("Login information is incorrect.");
+});
+
+// Create Account button
+document.getElementById("createButton").addEventListener("click", function () {
+  window.location.href = "newaccount.html";
+});
+</script>
+</body>
+</html>

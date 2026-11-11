@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Form</title>
+<style>
+body { font-family: Arial, sans-serif; font-size: 14pt; color: #222; background: #f4f6f8; margin: 30px; }
+fieldset { padding: 15px; margin-bottom: 15px; }
+legend { font-weight: bold; }
+input[type=text], select, textarea { font-size: 14pt; padding: 5px; }
+.row { margin-bottom: 14px; }
+button { font-size: 14pt; padding: 6px 14px; }
+</style>
+</head>
+<body>
+<h1>Your Form</h1>
+<p><a href="records.html">Go to the records page</a></p>
+
+<form id="myForm">
+  <fieldset>
+    <legend>About You</legend>
+
+    <div class="row">
+      <label for="name">Name:</label><br>
+      <input type="text" id="name">
+    </div>
+
+    <div class="row">
+      Favorite color:<br>
+      <input type="radio" name="color" id="red" value="Red">
+      <label for="red">Red</label>
+      <input type="radio" name="color" id="green" value="Green">
+      <label for="green">Green</label>
+      <input type="radio" name="color" id="blue" value="Blue">
+      <label for="blue">Blue</label>
+    </div>
+
+    <div class="row">
+      <label for="pet">Favorite pet:</label><br>
+      <select id="pet">
+        <option value="">Choose one...</option>
+        <option value="Dog">Dog</option>
+        <option value="Cat">Cat</option>
+        <option value="Fish">Fish</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <label for="rating">Rate this site (1-10):</label>
+      <span id="ratingValue">5</span><br>
+      <input type="range" id="rating" min="1" max="10" value="5">
+    </div>
+
+    <div class="row">
+      <input type="checkbox" id="subscribe">
+      <label for="subscribe">Subscribe to updates</label>
+    </div>
+
+    <div class="row">
+      <label for="comments">Comments:</label><br>
+      <textarea id="comments" rows="5" cols="40"></textarea>
+    </div>
+  </fieldset>
+
+  <button type="submit">Submit</button>
+</form>
+
+<script>
+var id = sessionStorage.getItem("loggedInId");
+if (id === null) {
+  window.location.href = "index.html";
+}
+var folder = "account_" + id;
+
+// Show the slider number as it moves
+document.getElementById("rating").addEventListener("input", function () {
+  document.getElementById("ratingValue").textContent = this.value;
+});
+
+// Data Loading: fill in the previous submission, if there is one
+var account = JSON.parse(localStorage.getItem(folder));
+if (account !== null && account.formData !== null) {
+  var data = account.formData;
+  document.getElementById("name").value = data.name;
+  document.getElementById("pet").value = data.pet;
+  document.getElementById("rating").value = data.rating;
+  document.getElementById("ratingValue").textContent = data.rating;
+  document.getElementById("subscribe").checked = data.subscribe;
+  document.getElementById("comments").value = data.comments;
+
+  var radios = document.getElementsByName("color");
+  for (var i = 0; i < radios.length; i++) {
+    if (radios[i].value === data.color) {
+      radios[i].checked = true;
+    }
+  }
+}
+
+// Data Storage: save everything into this account's file
+document.getElementById("myForm").addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  var color = "";
+  var radios = document.getElementsByName("color");
+  for (var i = 0; i < radios.length; i++) {
+    if (radios[i].checked) {
+      color = radios[i].value;
+    }
+  }
+
+  var account = JSON.parse(localStorage.getItem(folder));
+  account.formData = {
+    name: document.getElementById("name").value,
+    color: color,
+    pet: document.getElementById("pet").value,
+    rating: document.getElementById("rating").value,
+    subscribe: document.getElementById("subscribe").checked,
+    comments: document.getElementById("comments").value
+  };
+  localStorage.setItem(folder, JSON.stringify(account));
+
+  alert("Your answers were saved.");
+});
+</script>
+</body>
+</html>

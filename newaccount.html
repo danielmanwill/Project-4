@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>New Account</title>
+<style>
+body { font-family: Arial, sans-serif; font-size: 14pt; color: #222; background: #f4f6f8; margin: 30px; }
+input[type=text], input[type=password] { font-size: 14pt; padding: 5px; margin: 5px 0 12px 0; }
+button { font-size: 14pt; padding: 6px 14px; }
+</style>
+</head>
+<body>
+<h1>Create a New Account</h1>
+
+<label for="username">Username:</label><br>
+<input type="text" id="username"><br>
+
+<label for="password">Password:</label><br>
+<input type="password" id="password"><br>
+
+<button id="createButton">Create Account</button>
+<p id="message"></p>
+
+<p><a href="index.html">Back to the login page</a></p>
+
+<script>
+document.getElementById("createButton").addEventListener("click", function () {
+  var username = document.getElementById("username").value;
+  var password = document.getElementById("password").value;
+
+  if (username === "" || password === "") {
+    alert("Please enter both a username and a password.");
+    return;
+  }
+
+  // Read the existing Account List (older data is kept)
+  var list = JSON.parse(localStorage.getItem("accountList") || "[]");
+
+  // Don't allow the same username twice
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].username === username) {
+      alert("That username is already taken.");
+      return;
+    }
+  }
+
+  // The ID is one more than the number of accounts, so no two are the same
+  var id = list.length + 1;
+  var folder = "account_" + id;
+
+  // 1. Create the Account File
+  var accountFile = {
+    id: id,
+    username: username,
+    password: password,
+    formData: null
+  };
+  localStorage.setItem(folder, JSON.stringify(accountFile));
+
+  // 2. Add a new object to the Account List
+  list.push({ id: id, username: username, password: password, folder: folder });
+  localStorage.setItem("accountList", JSON.stringify(list));
+
+  // 3. Show a message with a link to the login page
+  document.getElementById("message").innerHTML =
+    'Account created! Your ID is ' + id + '. <a href="index.html">Go to the login page</a>';
+});
+</script>
+</body>
+</html>

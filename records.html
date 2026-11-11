@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Records</title>
+<style>
+body { font-family: Arial, sans-serif; font-size: 14pt; color: #222; background: #f4f6f8; margin: 30px; }
+select { font-size: 14pt; padding: 5px; }
+table { border-collapse: collapse; margin-top: 20px; background: white; }
+th, td { border: 1px solid #888; padding: 8px 12px; text-align: left; }
+th { background: #dde3ea; }
+</style>
+</head>
+<body>
+<h1>Records</h1>
+<p><a href="form.html">Go to the form page</a></p>
+
+<label for="idSelect">Choose an account ID:</label>
+<select id="idSelect">
+  <option value="">Select an ID...</option>
+</select>
+
+<p id="emptyMessage"></p>
+<table id="dataTable"></table>
+
+<script>
+if (sessionStorage.getItem("loggedInId") === null) {
+  window.location.href = "index.html";
+}
+
+var select = document.getElementById("idSelect");
+var table = document.getElementById("dataTable");
+var emptyMessage = document.getElementById("emptyMessage");
+
+// Fill the drop-down with every account ID
+var list = JSON.parse(localStorage.getItem("accountList") || "[]");
+for (var i = 0; i < list.length; i++) {
+  var option = document.createElement("option");
+  option.value = list[i].id;
+  option.textContent = list[i].id;
+  select.appendChild(option);
+}
+
+// Show the table when an ID is picked
+select.addEventListener("change", function () {
+  table.innerHTML = "";
+  emptyMessage.textContent = "";
+
+  if (select.value === "") {
+    return;
+  }
+
+  var account = JSON.parse(localStorage.getItem("account_" + select.value));
+  var data = account.formData;
+
+  // If the form was never submitted, every entry is empty
+  if (data === null) {
+    data = { name: "", color: "", pet: "", rating: "", subscribe: false, comments: "" };
+  }
+
+  var labels = ["Name", "Favorite color", "Favorite pet", "Rating", "Subscribed", "Comments"];
+  var values = [data.name, data.color, data.pet, data.rating, data.subscribe ? "Yes" : "No", data.comments];
+  var emptyList = [];
+
+  for (var i = 0; i < labels.length; i++) {
+    var row = table.insertRow();
+
+    var header = document.createElement("th");
+    header.textContent = labels[i];
+    row.appendChild(header);
+
+    var cell = row.insertCell();
+    cell.textContent = values[i];
+
+    // The checkbox (Subscribed) is not counted as empty
+    if (values[i] === "" && labels[i] !== "Subscribed") {
+      emptyList.push(labels[i]);
+    }
+  }
+
+  if (emptyList.length > 0) {
+    emptyMessage.textContent = "Left empty: " + emptyList.join(", ");
+  }
+});
+</script>
+</body>
+</html>
